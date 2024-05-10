@@ -36,29 +36,25 @@ export const register = async (req: express.Request, res: express.Response) => {
 export const login = async (req: express.Request, res: express.Response) => {
   const { email, password } = req.body
 
-  if (!email || !password) {
-    return res.status(400).json('Missing required fields')
-  }
-
   try {
-    const userExist = await prisma.user.findUnique({ where: { email } })
-    if (!userExist) {
-      return res.status(404).json('User not Found')
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) {
+      return res.status(404).json('User not found')
     }
-    const correctPassword = compareSync(password, userExist.password)
-    if (!correctPassword) {
-      return res.status(401).json('Invalid password')
-    }
-    const token = jwt.sign({ userID: userExist.id }, secret, { expiresIn: '1h' })
 
-    res.status(200).json({
-      message: `User logged in successfully, welcome back ${userExist.name}`,
-      token: token
-    })
+    const correctPassword = compareSync(password, user.password)
+    if (!correctPassword) {
+      return res.status(401).json('Invalid credentials')
+    }
+
+    const accessToken = jwt.sign({ userID: user.id, role: user.role }, secret, { expiresIn: '23m' })
+    
+
+    res.status(200).json({ accessToken })
   } catch (error) {
-    res.status(500).json('An error occurred while logging in')
-    console.error('Error during user login:', error)
+    console.error('Login error:', error)
+    res.status(500).json('An error occurred during login')
   }
 }
 
-export const logout = async (req: express.Request, res: express.Response) => {}
+

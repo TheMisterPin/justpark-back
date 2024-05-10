@@ -23,24 +23,27 @@ model Parking {
   location         String
   totalSpaces      Int                @default(0)
   parkedCars       Car[]
+  hourlyPrice      Float              @default(0.5)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   parkingAdmin     User               @relation(fields: [parkingAdminId], references: [id])
   parkingAdminId   Int
   WardenAssignment WardenAssignment[]
+  ParkingSession   ParkingSession[]
 
   @@map("parkings")
 }
 
 model Car {
-  id           Int      @id @default(autoincrement())
-  licencePlate String   @unique
-  parking      Parking? @relation(fields: [parkingId], references: [id])
-  parkingId    Int
-  owner        User     @relation(fields: [userId], references: [id])
-  userId       Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             Int              @id @default(autoincrement())
+  licencePlate   String           @unique
+  parking        Parking?         @relation(fields: [parkingId], references: [id])
+  parkingId      Int
+  owner          User             @relation(fields: [userId], references: [id])
+  userId         Int
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ParkingSession ParkingSession[]
 
   @@map("cars")
 }
@@ -67,4 +70,17 @@ model WardenAssignment {
   user      User    @relation(fields: [userId], references: [id])
 
   @@id([parkingId, userId])
+  @@map("wardens")
+}
+
+model ParkingSession {
+  id        Int       @id @default(autoincrement())
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+  carId     Int
+  parkingId Int
+  car       Car       @relation(fields: [carId], references: [id])
+  parking   Parking   @relation(fields: [parkingId], references: [id])
+
+  @@map("parking_sessions")
 }

@@ -1,20 +1,21 @@
-import express from "express";
+import express from 'express'
 import {
   getAllParkings,
   getParkingById,
   createParking,
   updateParking,
   deleteParking,
+  checkCars
+} from '../controllers/parkingController'
+import authMiddleware from '../middleware/auth'
 
-} from "../controllers/parkingController";
-import authMiddleware from "../middleware/auth";
+const router = express.Router()
 
-const router = express.Router();
+router.get('/', getAllParkings)
+router.get('/:parkingID', getParkingById)
+router.post('/', [authMiddleware], createParking)
+router.patch('/:parkingID', [authMiddleware], updateParking)
+router.delete('/:parkingID', [authMiddleware], deleteParking)
+router.get('/:parkingID/cars', [authMiddleware], checkCars)
 
-router.get("/", getAllParkings);
-router.get("/:parkingID", getParkingById);
-router.post("/", [authMiddleware], createParking)
-router.patch("/parkingID", [authMiddleware], updateParking)
-router.delete("/:parkingID", [authMiddleware], deleteParking)
-
-export default router;
+export default router

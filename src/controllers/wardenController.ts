@@ -19,7 +19,7 @@ async function getAllWardens(req: express.Request, res: express.Response) {
   }
 }
 
-async function getParkingWardens(req: express.Request, res: express.Response): Promise<void> {
+async function getParkingWardens(req: express.Request, res: express.Response) {
   const { parkingID } = req.params
   const owner = req.user
 
@@ -84,4 +84,65 @@ async function addWarden(req: express.Request, res: express.Response) {
     res.status(500).json({ message: 'Failed to add warden', error: error.message })
   }
 }
-export { getAllWardens, getParkingWardens, addWarden }
+async function updateWarden(req: express.Request, res: express.Response) {
+  const { wardenId } = req.params
+  const { name, email } = req.body
+  const owner = req.user
+
+  try {
+    const warden = await prisma.user.findUnique({
+      where: { id: parseInt(wardenId) }
+    })
+
+    if (!warden) {
+      res.status(404).json({ message: 'Warden not found' })
+      return
+    }
+
+    // Check if the user updating the warden is authorized (e.g., is an admin)
+    if (owner.role !== 'OWNER') {
+      res.status(403).json({ message: 'You are not authorized to update this warden' })
+      return
+    }
+
+    const updatedWarden = await prisma.user.update({
+      where: { id: parseInt(wardenId) },
+      data: { name, email }
+    })
+
+    res.json({ message: 'Warden updated successfully', warden: updatedWarden })
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update warden', error: error.message })
+  }
+}
+async function deleteWarden(req: express.Request, res: express.Response) {
+  const { wardenId } = req.params
+  const owner = req.user
+
+  try {
+    const warden = await prisma.user.findUnique({
+      where: { id: parseInt(wardenId) }
+    })
+
+    if (!warden) {
+      res.status(404).json({ message: 'Warden not found' })
+      return
+    }
+
+    // Check if the user deleting the warden is authorized
+    if (owner.role !== 'OWNER') {
+      res.status(403).json({ message: 'You are not authorized to delete this warden' })
+      return
+    }
+
+    await prisma.user.delete({
+      where: { id: parseInt(wardenId) }
+    })
+
+    res.json({ message: 'Warden deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete warden', error: error.message })
+  }
+}
+
+export { getAllWardens, getParkingWardens, addWarden, deleteWarden, updateWarden }
