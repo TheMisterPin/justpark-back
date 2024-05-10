@@ -4,14 +4,16 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import parkingRoutes from "./routes/parkingRoutes";
+import router from "./routes/router";
 
 const app = express();
 app.use(cors({ credentials: true }));
+
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use("/parkings", parkingRoutes);
+
+app.use("/", router);
 
 const server = http.createServer(app);
 const port = process.env.PORT;
