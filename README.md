@@ -21,13 +21,13 @@ The full API documentation can be found [here](https://justpark-back.vercel.app/
 
 
 ## 📬 Postman Collection
-You can access the Postman collection for testing the API [here](https://api.postman.com/collections/30920715-a929674b-f78a-49cc-8baf-22255a87205a?access_key=PMAT-01HXSXC2QPTZGDWYPMXA97KD4G).
+You can access the Postman collection for testing the API [here](https://api.postman.com).
 
 ## 🔧 Installation and Setup
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/parking-app-backend.git
+git clone https://github.com/TheMisterPin/justpark-back.git
 ```
 Install dependencies:
 
