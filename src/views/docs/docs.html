@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Park DOCS</title>
+    <link rel="stylesheet" href="../styles/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <h1>Just Park DOCS</h1>
+    </header>
+    <main>
+        <h2>Welcome to the Just Park DOCS</h2>
+
+        <h3>Authentication</h3>
+        <ul class="features">
+            <li><strong>POST /auth/signup</strong>: Registers a new user.</li>
+            <li><strong>POST /auth/login</strong>: Logs in a user and returns an access token.</li>
+        </ul>
+
+        <h3>Users</h3>
+        <ul class="features">
+            <li><strong>GET /users/me</strong>: Retrieves current user information based on their role.</li>
+            <li><strong>DELETE /users/:userID</strong>: Deletes a user by their ID.</li>
+            <li><strong>PUT /users/:userID</strong>: Updates user information.</li>
+        </ul>
+
+        <h3>Parkings</h3>
+        <ul class="features">
+            <li><strong>GET /parkings</strong>: Retrieves a list of all parkings.</li>
+            <li><strong>GET /parkings/:parkingID</strong>: Retrieves details of a specific parking by its ID.</li>
+            <li><strong>POST /parkings</strong>: Creates a new parking. (Requires authentication)</li>
+            <li><strong>PATCH /parkings/:parkingID</strong>: Updates details of a specific parking by its ID. (Requires
+                authentication)</li>
+            <li><strong>DELETE /parkings/:parkingID</strong>: Deletes a specific parking by its ID. (Requires
+                authentication)</li>
+            <li><strong>GET /parkings/:parkingID/cars</strong>: Checks cars in a specific parking by its ID. (Requires
+                authentication)</li>
+        </ul>
+
+        <h3>Cars</h3>
+        <ul class="features">
+            <li><strong>POST /cars</strong>: Registers a new car. (Requires authentication)</li>
+            <li><strong>PATCH /cars/:licencePlate</strong>: Updates the license plate of an existing car. (Requires
+                authentication)</li>
+            <li><strong>DELETE /cars/:licencePlate</strong>: Deletes a car by its license plate. (Requires
+                authentication)</li>
+        </ul>
+
+        <h3>Wardens</h3>
+        <ul class="features">
+            <li><strong>GET /wardens</strong>: Retrieves all wardens.</li>
+            <li><strong>GET /wardens/parking/:parkingID</strong>: Retrieves wardens for a specific parking.</li>
+            <li><strong>POST /wardens/parking/:parkingID</strong>: Adds a new warden to a specific parking.</li>
+            <li><strong>PUT /wardens/:wardenId</strong>: Updates a warden by their ID.</li>
+            <li><strong>DELETE /wardens/:wardenId</strong>: Deletes a warden by their ID.</li>
+        </ul>
+
+        <h3>Sessions</h3>
+        <ul class="features">
+            <li><strong>POST /session/:parkingID/start</strong>: Starts a new parking session. (Requires authentication)
+            </li>
+            <li><strong>DELETE /session/:sessionId</strong>: Deletes a parking session by its ID. (Requires
+                authentication)</li>
+            <li><strong>GET /session</strong>: Retrieves all parking sessions. (Requires authentication)</li>
+        </ul>
+
+    </main>
+</body>
+
+</html>

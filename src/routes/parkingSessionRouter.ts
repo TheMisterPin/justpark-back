@@ -18,3 +18,4 @@ parkingSessionRouter.delete('/:sessionId', [authMiddleware], deleteParkingSessio
 parkingSessionRouter.get('/', [authMiddleware], getAllParkingSessions)
 
 export default parkingSessionRouter
+

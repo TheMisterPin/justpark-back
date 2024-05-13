@@ -16,8 +16,7 @@ app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
 app.use('/wardens', wardenRoutes)
 app.use('/session', parkingSessionRouter)
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'JustPark backend api' })
-})
+
 
 export default app
+
