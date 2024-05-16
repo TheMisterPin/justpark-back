@@ -63,6 +63,7 @@ async function customerInfo(user: User): Promise<CustomerInfo> {
       id: true,
       name: true,
       email: true,
+      credit: true,
       cars: {
         select: {
           id: true,
@@ -93,6 +94,7 @@ async function customerInfo(user: User): Promise<CustomerInfo> {
     id: userData.id,
     name: userData.name,
     email: userData.email,
+    credit: userData.credit,
     cars: userData.cars.map(car => ({
       id: car.id,
       licencePlate: car.licencePlate,
@@ -103,6 +105,48 @@ async function customerInfo(user: User): Promise<CustomerInfo> {
         parkingName: session.parking.name
       }))
     }))
+  }
+}
+async function addCredit(req: express.Request, res: express.Response) {
+  const user = req.user
+  const { amount } = req.body
+
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    })
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { credit: existingUser.credit + amount }
+    })
+
+    res.json({
+      message: `Succeffully added ${amount} to your account, new balance is ${updatedUser.credit}`
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to add credit', error: error.message })
+  }
+}
+async function checkCredit(req: express.Request, res: express.Response) {
+  const user = req.user
+
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    })
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.json({ message: `Your current balance is ${existingUser.credit}` })
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to check credit', error: error.message })
   }
 }
 
@@ -139,30 +183,30 @@ async function currentUser(req: express.Request, res: express.Response): Promise
   }
 }
 
-
 async function updateUser(req: express.Request, res: express.Response) {
-  const  user = req.user
+  const user = req.user
+  const userID = parseInt(req.params.userID, 10)
   const { name, email } = req.body
- 
+  if (user.id !== userID) {
+    return res.status(403).json({ message: 'You are not authorized to update this User' })
+  }
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { id: user.id}
+      where: { id: user.id }
     })
     if (!existingUser) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-
     await prisma.user.update({
       where: { id: user.id },
       data: {
         name: name ?? user.name,
-        email: email ?? existingUser.email,
-        
+        email: email ?? existingUser.email
       }
     })
-    res.json("user updated")
+    res.json('user updated')
   } catch (error) {
     res.status(500).json({ message: 'Failed to update parking', error: error.message })
   }
@@ -191,4 +235,4 @@ async function deleteUser(req: express.Request, res: express.Response) {
     res.status(500).json({ message: 'Failed to delete User', error: error.message })
   }
 }
-export {currentUser, updateUser, deleteUser}
+export { currentUser, updateUser, deleteUser, addCredit, checkCredit }

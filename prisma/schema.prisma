@@ -18,31 +18,32 @@ enum Role {
 }
 
 model Parking {
-  id               Int                @id @default(autoincrement())
-  name             String
-  location         String
-  totalSpaces      Int                @default(0)
-  parkedCars       Car[]
-  hourlyPrice      Float              @default(0.5)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  parkingAdmin     User               @relation(fields: [parkingAdminId], references: [id])
-  parkingAdminId   Int
-  wardens WardenAssignment[]
-  parkingSessions   ParkingSession[]
+  id              Int                @id @default(autoincrement())
+  name            String
+  location        String
+  totalSpaces     Int                @default(0)
+  parkedCars      Car[]
+  hourlyPrice     Float              @default(0.5)
+  takings         Float              @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  parkingAdmin    User               @relation(fields: [parkingAdminId], references: [id])
+  parkingAdminId  Int
+  wardens         WardenAssignment[]
+  parkingSessions ParkingSession[]
 
   @@map("parkings")
 }
 
 model Car {
-  id             Int              @id @default(autoincrement())
-  licencePlate   String           @unique
+  id              Int              @id @default(autoincrement())
+  licencePlate    String           @unique
   parkedAt        Parking?         @relation(fields: [parkingId], references: [id])
-  parkingId      Int
-  owner          User             @relation(fields: [userId], references: [id])
-  userId         Int
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  parkingId       Int?
+  owner           User             @relation(fields: [userId], references: [id])
+  userId          Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   parkingSessions ParkingSession[]
 
   @@map("cars")
@@ -53,11 +54,12 @@ model User {
   email            String             @unique
   password         String
   name             String
+  credit           Float              @default(50)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   role             Role               @default(CUSTOMER)
-cars             Car[]
-  parkings          Parking[]
+  cars             Car[]
+  parkings         Parking[]
   WardenAssignment WardenAssignment[]
 
   @@map("users")
@@ -66,8 +68,10 @@ cars             Car[]
 model WardenAssignment {
   parkingId Int
   userId    Int
-  parking   Parking @relation(fields: [parkingId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
+  parking   Parking  @relation(fields: [parkingId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([parkingId, userId])
   @@map("wardens")
@@ -79,6 +83,7 @@ model ParkingSession {
   endTime   DateTime?
   carId     Int
   parkingId Int
+  amount   Float 
   car       Car       @relation(fields: [carId], references: [id])
   parking   Parking   @relation(fields: [parkingId], references: [id])
 

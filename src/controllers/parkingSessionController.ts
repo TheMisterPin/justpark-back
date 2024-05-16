@@ -1,15 +1,32 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 
+
 const prisma = new PrismaClient()
+
+async function isParkingFull(parkingID: number): Promise<boolean> {
+  const selectedParking = await prisma.parking.findUnique({
+    where: { id: parkingID },
+    include: { parkedCars: true }
+  })
+
+  if (!selectedParking) {
+    return false
+  }
+
+  return selectedParking.parkedCars.length >= selectedParking.totalSpaces
+}
 
 async function startParkingSession(req: express.Request, res: express.Response) {
   const { parkingID } = req.params
-  const { carId } = req.body
+  const { licencePlate, totalHours } = req.body
+  const carOwner = req.user
+
   if (!parkingID) {
     res.status(404).json({ message: 'Must give parking ID' })
     return
   }
+
   try {
     const parkingId = parseInt(parkingID, 10)
     if (isNaN(parkingId)) {
@@ -17,39 +34,80 @@ async function startParkingSession(req: express.Request, res: express.Response) 
       return
     }
 
-    const selectedParking = await prisma.parking.findUnique({
-      where: { id: parkingId },
-      include: { parkedCars: true }
-    })
+    const isFull = await isParkingFull(parkingId)
+    if (isFull) {
+      res.status(406).json({ message: 'Selected parking is full' })
+      return
+    }
 
+    const selectedParking = await prisma.parking.findUnique({
+      where: { id: parkingId }
+    })
     if (!selectedParking) {
       res.status(404).json({ message: 'Parking not found' })
       return
     }
 
-    if (selectedParking.parkedCars.length >= selectedParking.totalSpaces) {
-      res.status(406).json({ message: 'Selected parking is full' })
+    const car = await prisma.car.findUnique({
+      where: { licencePlate: licencePlate }
+    })
+    if (!car) {
+      res.status(404).json({ message: 'Car not found' })
       return
     }
 
-    await prisma.parkingSession.create({
-      data: {
-        carId: parseInt(carId, 10),
-        parkingId: parkingId
-      }
+    const endTime = new Date()
+    endTime.setHours(endTime.getHours() + totalHours)
+    const amount = totalHours * selectedParking.hourlyPrice
+
+    await prisma.$transaction(async prisma => {
+      const session = await prisma.parkingSession.create({
+        data: {
+          carId: car.id,
+          parkingId: selectedParking.id,
+          startTime: new Date(),
+          endTime: endTime,
+          amount: amount
+        }
+      })
+
+      await prisma.car.update({
+        where: { id: car.id },
+        data: { parkingId: selectedParking.id }
+      })
+
+      await prisma.parking.update({
+        where: { id: selectedParking.id },
+        data: {
+          parkedCars: {
+            connect: { id: car.id }
+          },
+          takings: {
+            increment: amount
+          }
+        }
+      })
+
+      await prisma.user.update({
+        where: { id: carOwner.id },
+        data: { credit: { decrement: amount } }
+      })
+
+      return session
     })
 
-    res.status(201).json({ message: 'Session created successfully!' })
+    res.status(201).json({ message: 'Session created successfully!', endTime: endTime })
   } catch (error) {
     res.status(500).json({ message: 'Failed to start parking session', error: error.message })
   }
 }
+
 async function getAllParkingSessions(req: express.Request, res: express.Response) {
   try {
     const sessions = await prisma.parkingSession.findMany({
       include: {
-        car: true, // Include details about the car
-        parking: true // Include details about the parking
+        car: true,
+        parking: true 
       }
     })
 
