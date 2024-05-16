@@ -50,7 +50,7 @@ export const login = async (req: express.Request, res: express.Response) => {
     const accessToken = jwt.sign({ userID: user.id, role: user.role }, secret, { expiresIn: '23m' })
     
 
-    res.status(200).json({ accessToken })
+    res.status(200).json({message:`Welcome Back ${user.name}` , accessToken })
   } catch (error) {
     console.error('Login error:', error)
     res.status(500).json('An error occurred during login')

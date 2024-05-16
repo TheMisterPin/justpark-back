@@ -10,6 +10,7 @@ interface CustomerInfo {
   name: string
   email: string
   cars: CarInfo[]
+  credit : number
 
 }
 interface WardenInfo{}
