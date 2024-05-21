@@ -1,18 +1,19 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
+import { Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function getAllParkings(req: express.Request, res: express.Response) {
+const getAllParkings = async (req: express.Request, res: express.Response) => {
   try {
     const parkings = await prisma.parking.findMany()
-    res.json(parkings)
+    res.status(200).json(parkings)
   } catch (error) {
     res.status(500).json({ message: 'Failed to retrieve parkings', error: error.message })
   }
 }
 
-async function getParkingById(req: express.Request, res: express.Response) {
+const getParkingById = async (req: express.Request, res: express.Response) => {
   const { parkingID } = req.params
   try {
     const parking = await prisma.parking.findUnique({
@@ -28,9 +29,10 @@ async function getParkingById(req: express.Request, res: express.Response) {
   }
 }
 
-async function createParking(req: express.Request, res: express.Response) {
+const createParking = async (req: express.Request, res: express.Response) => {
   const { name, location, totalSpaces } = req.body
   const parkingAdmin = req.user
+  const userRole = req.role
 
   if (!parkingAdmin || !parkingAdmin.id) {
     return res.status(403).json({ message: 'No parking admin specified or incorrect user data' })
@@ -46,7 +48,7 @@ async function createParking(req: express.Request, res: express.Response) {
         data: {
           name,
           location,
-          totalSpaces: totalSpaces || 10, // Consider handling this default at the model level
+          totalSpaces: totalSpaces || 10,
           parkingAdmin: {
             connect: {
               id: parkingAdmin.id
@@ -56,15 +58,15 @@ async function createParking(req: express.Request, res: express.Response) {
       })
 
       let roleUpdated = false
-      if (parkingAdmin.role !== 'OWNER') {
+      if (userRole !== Role.OWNER) {
         await tx.user.update({
           where: { id: parkingAdmin.id },
-          data: { role: 'OWNER' }
+          data: {  role: Role.OWNER  }
         })
         roleUpdated = true
       }
 
-      res.json({
+      res.status(200).json({
         parking,
         message: roleUpdated ? 'User role updated to OWNER.' : 'User role unchanged.'
       })
@@ -74,7 +76,7 @@ async function createParking(req: express.Request, res: express.Response) {
   }
 }
 
-async function updateParking(req: express.Request, res: express.Response) {
+const updateParking = async (req: express.Request, res: express.Response) => {
   const { parkingID } = req.params
   const { name, location, totalSpaces } = req.body
   const owner = req.user
@@ -104,7 +106,7 @@ async function updateParking(req: express.Request, res: express.Response) {
   }
 }
 
-async function deleteParking(req: express.Request, res: express.Response) {
+const deleteParking = async (req: express.Request, res: express.Response) => {
   const { parkingID } = req.params
   const owner = req.user
 
@@ -128,28 +130,23 @@ async function deleteParking(req: express.Request, res: express.Response) {
   }
 }
 
-async function checkCars(req: express.Request, res: express.Response) {
+const checkCars = async (req: express.Request, res: express.Response) => {
   const { parkingID } = req.params
-  const checker = req.user
-  const authorizedRoles = ['OWNER', 'WARDEN']
 
   if (!parkingID) {
     return res.status(404).json({ message: "Can't find parking" })
   }
 
 
-  if (!authorizedRoles.includes(checker.role)) {
-    return res.status(403).json({ message: "You're not authorized to access this information" })
-  }
 
   try {
     const parking = await prisma.parking.findUnique({
       where: { id: parseInt(parkingID, 10) },
-      select: { parkedCars: true, _count: true } 
+      select: { parkedCars: true, _count: true }
     })
 
     if (parking) {
-      res.json(parking) 
+      res.json(parking)
     } else {
       res.status(404).json({ message: 'Parking not found' })
     }

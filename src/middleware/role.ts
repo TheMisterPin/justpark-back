@@ -1,30 +1,37 @@
 import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
-import { PrismaClient, User } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
+const jwt_secret = process.env.JWT_SECRET as string
 
-
-// Middleware to check for authentication and role
-const roleMiddleware = (requiredRole: User['role']) => {
+const roleMiddleware = (requiredRole: Role) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization
     if (!token) {
       return res.status(401).json({ message: 'Token not found' })
     }
+
     try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET as string) as any
-      const user = await prisma.user.findUnique({ where: { id: payload.userID } })
-      if (!user) {
-        return res.status(401).json({ message: 'User Not Found' })
+      const payload = jwt.verify(token, jwt_secret ) as any
+      const auth = await prisma.auth.findUnique({
+        where: { sessionToken: token },
+        include: { user: true }
+      })
+      if (!auth) {
+        return res.status(401).json({ message: 'Session not found' })
       }
-      req.role = user.role
+
+      const user = auth.user
       if (user.role !== requiredRole) {
         return res.status(403).json({ message: 'Forbidden' })
       }
+
+      req.user = user
+      req.role = user.role
       next()
     } catch (error) {
-      return res.status(500).json({ message: 'Failed to authenticate token' })
+      return res.status(500).json({ message: 'Failed to authenticate token', error: error.message })
     }
   }
 }

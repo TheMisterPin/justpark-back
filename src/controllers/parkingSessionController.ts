@@ -111,7 +111,7 @@ async function getAllParkingSessions(req: express.Request, res: express.Response
       }
     })
 
-    res.json(sessions)
+    res.status(200).json(sessions)
   } catch (error) {
     res.status(500).json({ message: 'Failed to retrieve parking sessions', error: error.message })
   }

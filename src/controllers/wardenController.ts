@@ -99,7 +99,7 @@ async function updateWarden(req: express.Request, res: express.Response) {
       return
     }
 
-    // Check if the user updating the warden is authorized (e.g., is an admin)
+ 
     if (owner.role !== 'OWNER') {
       res.status(403).json({ message: 'You are not authorized to update this warden' })
       return
@@ -129,7 +129,7 @@ async function deleteWarden(req: express.Request, res: express.Response) {
       return
     }
 
-    // Check if the user deleting the warden is authorized
+ 
     if (owner.role !== 'OWNER') {
       res.status(403).json({ message: 'You are not authorized to delete this warden' })
       return

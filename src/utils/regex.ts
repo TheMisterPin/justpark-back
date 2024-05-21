@@ -1,8 +1,4 @@
-enum ValidationTypes {
-  email,
-  name,
-  password
-}
+
 
 function validateThis(validate: string, type: ValidationTypes) {
   switch (type) {

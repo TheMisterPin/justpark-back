@@ -9,16 +9,21 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     return res.status(401).json({ message: 'Token not found' })
   }
+
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET as string) as any
-    const user = await prisma.user.findUnique({ where: { id: payload.userID } })
-    if (!user) {
-      return res.status(401).json({ message: 'User Not Found' })
+    const auth = await prisma.auth.findUnique({
+      where: { sessionToken: token },
+      include: { user: true }
+    })
+    if (!auth) {
+      return res.status(401).json({ message: 'Session not found' })
     }
-    req.user = user
+
+    req.user = auth.user
     next()
   } catch (error) {
-    return res.status(500).json({ message: 'Failed to authenticate token' })
+    return res.status(500).json({ message: 'Failed to authenticate token', error: error.message })
   }
 }
 
