@@ -1,13 +1,15 @@
+import express from 'express'
 import parkingRoutes from './parkingRoutes'
 import wardenRoutes from './wardenRoutes'
 import authRoutes from './authRoutes'
 import userRoutes from './userRoutes'
 import roleMiddleware from '../middleware/role'
 import parkingSessionRouter from './parkingSessionRouter'
-import express from 'express'
 
 const cors = require('cors')
+
 const app = express()
+
 app.use(express.json())
 app.use(cors())
 

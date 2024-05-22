@@ -5,8 +5,8 @@ const prisma = new PrismaClient()
 async function cleanup(email: string) {
   await prisma.user.delete({
     where: {
-      email: email
-    }
+      email,
+    },
   })
 }
 export default cleanup

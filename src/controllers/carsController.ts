@@ -9,16 +9,18 @@ async function addCar(req: express.Request, res: express.Response): Promise<void
 
   if (!owner) {
     res.status(403).json({ message: 'Must be logged in to register a car' })
+
     return
   }
 
   try {
     const carExists = await prisma.car.findUnique({
-      where: { licencePlate }
+      where: { licencePlate },
     })
 
     if (carExists) {
       res.status(409).json({ message: 'Licence plate already in use' })
+
       return
     }
 
@@ -27,10 +29,10 @@ async function addCar(req: express.Request, res: express.Response): Promise<void
         licencePlate,
         owner: {
           connect: {
-            id: owner.id
-          }
-        }
-      }
+            id: owner.id,
+          },
+        },
+      },
     })
 
     res.status(201).json({ message: 'Car created!' })
@@ -46,27 +48,30 @@ async function updateCar(req: express.Request, res: express.Response): Promise<v
 
   if (!owner) {
     res.status(403).json({ message: 'Must be logged in to modify a car' })
+
     return
   }
 
   try {
     const car = await prisma.car.findUnique({
-      where: { licencePlate }
+      where: { licencePlate },
     })
 
     if (!car) {
       res.status(404).json({ message: 'Wrong licence Plate' })
+
       return
     }
 
-    if (car.userId != owner.id){
-          res.status(403).json({ message: 'Not your car!' })
-          return
+    if (car.userId !== owner.id) {
+      res.status(403).json({ message: 'Not your car!' })
+
+      return
     }
 
     await prisma.car.update({
       where: { licencePlate },
-      data: { licencePlate: newLicence }
+      data: { licencePlate: newLicence },
     })
 
     res.status(200).json({ message: `Licence plate updated to: ${newLicence}` })
@@ -81,26 +86,29 @@ async function deleteCar(req: express.Request, res: express.Response): Promise<v
 
   if (!owner) {
     res.status(403).json({ message: 'Must be logged in to delete a car' })
+
     return
   }
 
   try {
     const car = await prisma.car.findUnique({
-      where: { licencePlate }
+      where: { licencePlate },
     })
 
     if (!car) {
       res.status(404).json({ message: 'Car not found' })
+
       return
     }
 
     if (car.userId !== owner.id) {
       res.status(403).json({ message: 'You are not authorized to delete this car' })
+
       return
     }
 
     await prisma.car.delete({
-      where: { licencePlate }
+      where: { licencePlate },
     })
 
     res.status(200).json({ message: 'Car deleted successfully' })

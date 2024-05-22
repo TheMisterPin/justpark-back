@@ -1,0 +1,137 @@
+import parkingRoutes from './parkingRoutes'
+import wardenRoutes from './wardenRoutes'
+import authRoutes from './authRoutes'
+import userRoutes from './userRoutes'
+import roleMiddleware from '../middleware/role'
+import parkingSessionRouter from './parkingSessionRouter'
+import express from 'express'
+
+const cors = require('cors')
+const app = express()
+app.use(express.json())
+app.use(cors())
+
+app.use('/parkings', parkingRoutes)
+app.use('/auth', authRoutes)
+app.use('/users', userRoutes)
+app.use('/wardens', roleMiddleware('WARDEN'), wardenRoutes)
+app.use('/session', parkingSessionRouter)
+
+export default app
+
+
+import express from 'express'
+import {
+  getAllWardens,
+  getParkingWardens,
+  addWarden,
+  updateWarden,
+  deleteWarden
+} from '../controllers/wardenController'
+
+const router = express.Router()
+
+router.get('/wardens', getAllWardens)
+
+router.get('/wardens/parking/:parkingID', getParkingWardens)
+
+router.post('/wardens/parking/:parkingID', addWarden)
+
+router.put('/wardens/:wardenId', updateWarden)
+
+router.delete('/wardens/:wardenId', deleteWarden)
+
+export default router
+
+import authMiddleware from '../middleware/auth'
+import {
+  addCredit,
+  currentUser,
+  deleteUser,
+  updateUser,
+  checkCredit
+} from '../controllers/userController'
+import express from 'express'
+import carRouter from './carRoutes'
+
+const router = express.Router()
+
+router.get('/me', [authMiddleware], currentUser)
+router.delete('/:userID', [authMiddleware], deleteUser)
+router.put('/:userID', [authMiddleware], updateUser)
+router.put('/credit/:userID', [authMiddleware], addCredit)
+router.get('/credit/:userID', [authMiddleware], checkCredit)
+router.use('/cars', [authMiddleware], carRouter)
+
+export default router
+import express from 'express'
+import {
+  startParkingSession,
+  deleteParkingSession,
+  getAllParkingSessions,
+  updateParkingSession
+} from '../controllers/parkingSessionController'
+import authMiddleware from '../middleware/auth'
+
+const parkingSessionRouter = express.Router()
+
+parkingSessionRouter.post('/:parkingID/start', [authMiddleware], startParkingSession)
+
+parkingSessionRouter.delete('/:sessionId', [authMiddleware], deleteParkingSession)
+
+parkingSessionRouter.patch('/:sessionId', updateParkingSession)
+
+parkingSessionRouter.get('/', [authMiddleware], getAllParkingSessions)
+
+export default parkingSessionRouter
+
+import express from 'express'
+import {
+  getAllParkings,
+  getParkingById,
+  createParking,
+  updateParking,
+  deleteParking,
+  checkCars
+} from '../controllers/parkingController'
+import authMiddleware from '../middleware/auth'
+import roleMiddleware from '../middleware/role'
+import { Role } from '@prisma/client'
+
+const router = express.Router()
+
+router.get('/', getAllParkings)
+router.get('/:parkingID', getParkingById)
+router.post('/', authMiddleware, createParking)
+router.put('/:parkingID', authMiddleware, roleMiddleware(Role.OWNER), updateParking)
+router.delete('/:parkingID', authMiddleware, roleMiddleware(Role.OWNER), deleteParking)
+router.get('/:parkingID/cars', authMiddleware, checkCars)
+
+export default router
+
+import express from 'express'
+import { addCar, updateCar, deleteCar } from '../controllers/carsController'
+
+const carRouter = express.Router()
+
+carRouter.post('/', addCar)
+
+carRouter.patch('/:licencePlate', updateCar)
+
+carRouter.delete('/:licencePlate', deleteCar)
+
+export default carRouter
+
+import authMiddleware from '../middleware/auth'
+import { login, register, logout, resetPassword, lostPassword } from '../controllers/authController'
+import express from 'express'
+
+const router = express.Router()
+
+router.post('/signup', register)
+router.post('/login', login)
+router.post('/logout', [authMiddleware], logout)
+router.post('/lostpassword/', lostPassword)
+router.post('/reset-password/:token', resetPassword)
+
+export default router

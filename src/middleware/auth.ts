@@ -1,21 +1,29 @@
 import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
+import { isTokenBlacklisted } from '../utils/blacklist'
 
 const prisma = new PrismaClient()
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization
+
   if (!token) {
     return res.status(401).json({ message: 'Token not found' })
   }
 
+  if (isTokenBlacklisted(token)) {
+    return res.status(401).json({ message: 'Token has been blacklisted' })
+  }
+
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET as string) as any
+    jwt.verify(token, process.env.JWT_SECRET as string) as any
+
     const auth = await prisma.auth.findUnique({
       where: { sessionToken: token },
-      include: { user: true }
+      include: { user: true },
     })
+
     if (!auth) {
       return res.status(401).json({ message: 'Session not found' })
     }

@@ -2,20 +2,19 @@ import express from 'express'
 import {
   startParkingSession,
   deleteParkingSession,
-  getAllParkingSessions
+  getAllParkingSessions,
+  updateParkingSession,
 } from '../controllers/parkingSessionController'
-import authMiddleware from '../middleware/auth' 
+import authMiddleware from '../middleware/auth'
 
 const parkingSessionRouter = express.Router()
 
-// Start a parking session
 parkingSessionRouter.post('/:parkingID/start', [authMiddleware], startParkingSession)
 
-// Delete a parking session
 parkingSessionRouter.delete('/:sessionId', [authMiddleware], deleteParkingSession)
 
-// Get all parking sessions
+parkingSessionRouter.patch('/:sessionId', updateParkingSession)
+
 parkingSessionRouter.get('/', [authMiddleware], getAllParkingSessions)
 
 export default parkingSessionRouter
-

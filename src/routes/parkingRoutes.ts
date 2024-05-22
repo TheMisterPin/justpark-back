@@ -1,16 +1,15 @@
 import express from 'express'
+import { Role } from '@prisma/client'
 import {
   getAllParkings,
   getParkingById,
   createParking,
   updateParking,
   deleteParking,
-  checkCars
+  checkCars,
 } from '../controllers/parkingController'
 import authMiddleware from '../middleware/auth'
-import roleMiddleware from '../middleware/role';
-import { Role } from '@prisma/client';
-
+import roleMiddleware from '../middleware/role'
 
 const router = express.Router()
 

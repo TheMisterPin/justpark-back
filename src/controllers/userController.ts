@@ -14,10 +14,10 @@ async function ownerInfo(user: User): Promise<OwnerInfo> {
         select: {
           id: true,
           name: true,
-          parkedCars: true // This will get the array to calculate length
-        }
-      }
-    }
+          parkedCars: true, // This will get the array to calculate length
+        },
+      },
+    },
   })
 
   if (!userData) {
@@ -29,11 +29,11 @@ async function ownerInfo(user: User): Promise<OwnerInfo> {
     id: userData.id,
     name: userData.name,
     email: userData.email,
-    parkings: userData.parkings.map(parking => ({
+    parkings: userData.parkings.map((parking) => ({
       id: parking.id,
       name: parking.name,
-      parkedCars: parking.parkedCars.length
-    }))
+      parkedCars: parking.parkedCars.length,
+    })),
   }
 }
 
@@ -44,15 +44,15 @@ async function wardenInfo(user: User): Promise<any> {
       parking: {
         select: {
           id: true,
-          name: true
-        }
-      }
-    }
+          name: true,
+        },
+      },
+    },
   })
 
-  return assignments.map(assignment => ({
+  return assignments.map((assignment) => ({
     parkingId: assignment.parking.id,
-    parkingName: assignment.parking.name
+    parkingName: assignment.parking.name,
   }))
 }
 
@@ -76,14 +76,14 @@ async function customerInfo(user: User): Promise<CustomerInfo> {
               parking: {
                 select: {
                   id: true,
-                  name: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
 
   if (!userData) {
@@ -95,25 +95,26 @@ async function customerInfo(user: User): Promise<CustomerInfo> {
     name: userData.name,
     email: userData.email,
     credit: userData.credit,
-    cars: userData.cars.map(car => ({
+    cars: userData.cars.map((car) => ({
       id: car.id,
       licencePlate: car.licencePlate,
-      parkingSessions: car.parkingSessions.map(session => ({
+      parkingSessions: car.parkingSessions.map((session) => ({
         id: session.id,
         startTime: session.startTime,
         endTime: session.endTime,
-        parkingName: session.parking.name
-      }))
-    }))
+        parkingName: session.parking.name,
+      })),
+    })),
   }
 }
+
 async function addCredit(req: express.Request, res: express.Response) {
-  const user = req.user
+  const { user } = req
   const { amount } = req.body
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
     })
 
     if (!existingUser) {
@@ -122,22 +123,23 @@ async function addCredit(req: express.Request, res: express.Response) {
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { credit: existingUser.credit + amount }
+      data: { credit: existingUser.credit + amount },
     })
 
     res.json({
-      message: `Succeffully added ${amount} to your account, new balance is ${updatedUser.credit}`
+      message: `Succeffully added ${amount} to your account, new balance is ${updatedUser.credit}`,
     })
   } catch (error) {
     res.status(500).json({ message: 'Failed to add credit', error: error.message })
   }
 }
+
 async function checkCredit(req: express.Request, res: express.Response) {
-  const user = req.user
+  const { user } = req
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
     })
 
     if (!existingUser) {
@@ -151,10 +153,11 @@ async function checkCredit(req: express.Request, res: express.Response) {
 }
 
 async function currentUser(req: express.Request, res: express.Response): Promise<void> {
-  const user = req.user
+  const { user } = req
 
   if (!user) {
     res.status(403).json({ message: 'No user logged in' })
+
     return
   }
 
@@ -173,6 +176,7 @@ async function currentUser(req: express.Request, res: express.Response): Promise
         break
       default:
         res.status(403).json({ message: 'Invalid user role' })
+
         return
     }
 
@@ -184,17 +188,19 @@ async function currentUser(req: express.Request, res: express.Response): Promise
 }
 
 async function updateUser(req: express.Request, res: express.Response) {
-  const user = req.user
+  const { user } = req
   const userID = parseInt(req.params.userID, 10)
   const { name, email } = req.body
+
   if (user.id !== userID) {
     return res.status(403).json({ message: 'You are not authorized to update this User' })
   }
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
     })
+
     if (!existingUser) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -203,8 +209,8 @@ async function updateUser(req: express.Request, res: express.Response) {
       where: { id: user.id },
       data: {
         name: name ?? user.name,
-        email: email ?? existingUser.email
-      }
+        email: email ?? existingUser.email,
+      },
     })
     res.json('user updated')
   } catch (error) {
@@ -214,12 +220,13 @@ async function updateUser(req: express.Request, res: express.Response) {
 
 async function deleteUser(req: express.Request, res: express.Response) {
   const { userID } = req.params
-  const user = req.user
+  const { user } = req
 
   try {
     const existingUser = await prisma.user.findUnique({
-      where: { id: parseInt(userID, 10) }
+      where: { id: parseInt(userID, 10) },
     })
+
     if (!existingUser) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -228,11 +235,13 @@ async function deleteUser(req: express.Request, res: express.Response) {
     }
 
     await prisma.user.delete({
-      where: { id: parseInt(userID, 10) }
+      where: { id: parseInt(userID, 10) },
     })
     res.json({ message: 'User deleted successfully' })
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete User', error: error.message })
   }
 }
-export { currentUser, updateUser, deleteUser, addCredit, checkCredit }
+export {
+  currentUser, updateUser, deleteUser, addCredit, checkCredit,
+}

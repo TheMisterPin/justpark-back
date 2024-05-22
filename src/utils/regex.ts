@@ -1,22 +1,65 @@
-
-
-function validateThis(validate: string, type: ValidationTypes) {
-  switch (type) {
-    case ValidationTypes.email: {
-      const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-      return emailRegex.test(validate)
-    }
-    case ValidationTypes.password: {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
-      return passwordRegex.test(validate)
-    }
-    case ValidationTypes.name: {
-      const nameRegex = /^[a-zA-Z\s]+$/
-      return nameRegex.test(validate)
-    }
-    default:
-      return false
-  }
+module.exports = {
+  env: {
+    commonjs: true,
+    es6: true,
+    node: true,
+    browser: true,
+    jest: true,
+  },
+  extends: [
+    'airbnb-base',
+    'prettier',
+    'plugin:node/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+  ],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
+  },
+  plugins: [
+    'prettier',
+    '@typescript-eslint',
+  ],
+  rules: {
+    'prettier/prettier': 'error',
+    'no-unused-vars': 'warn',
+    'no-console': 'off',
+    'func-names': 'off',
+    'no-plusplus': 'off',
+    'no-process-exit': 'off',
+    'class-methods-use-this': 'off',
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        ts: 'never',
+        js: 'never',
+      },
+    ],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'linebreak-style': 'off', // Disable linebreak-style rule
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
+    },
+  },
+  overrides: [
+    {
+      files: ['.eslintrc.js'],
+      parserOptions: {
+        sourceType: 'script',
+      },
+    },
+  ],
 }
-
-export default validateThis

@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextIndex", "fullTextSearch"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -11,7 +11,7 @@ datasource db {
 model Auth {
   id            Int      @id @default(autoincrement())
   sessionToken  String?  @unique
-  passwordToken String? 
+  passwordToken String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   userId        Int      @unique
@@ -20,25 +20,34 @@ model Auth {
   @@map("auths")
 }
 
+model Location {
+  id        Int      @id @default(autoincrement())
+  latitude  Float
+  longitude Float
+  parking   Parking?
+
+  @@map("locations")
+}
+
 model Parking {
-  id              Int                @id @default(autoincrement())
-  name            String
-  location        String
-  totalSpaces     Int                @default(0)
-  hourlyPrice     Float              @default(0.5)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  parkingAdminId  Int
-  takings         Float              @default(0)
-  parkedCars      Car[]
-  parkingSessions ParkingSession[]
-  parkingAdmin    User               @relation(fields: [parkingAdminId], references: [id])
-  wardens         WardenAssignment[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  totalSpaces      Int                @default(0)
+  hourlyPrice      Float              @default(0.5)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  parkingAdminId   Int
+  locationId       Int                @unique
+  takings          Float              @default(0)
+  parkedCars       Car[]
+  parkingSessions  ParkingSession[]
+  parkingAdmin     User               @relation(fields: [parkingAdminId], references: [id])
+  location         Location           @relation(fields: [locationId], references: [id])
+  WardenAssignment WardenAssignment[]
 
   @@index([parkingAdminId], map: "parkings_parkingAdminId_fkey")
   @@map("parkings")
 }
-
 model Car {
   id              Int              @id @default(autoincrement())
   licencePlate    String           @unique

@@ -4,7 +4,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: User
-      role? : User['role']
+      role?: User['role']
     }
   }
 }

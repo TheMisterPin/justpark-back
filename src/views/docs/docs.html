@@ -20,13 +20,23 @@
         <ul class="features">
             <li><strong>POST /auth/signup</strong>: Registers a new user.</li>
             <li><strong>POST /auth/login</strong>: Logs in a user and returns an access token.</li>
+            <li><strong>POST /auth/logout</strong>: Logs out a user and invalidates the session token. (Requires
+                authentication)</li>
+            <li><strong>POST /auth/lostpassword</strong>: Sends a password reset link to the user's email.</li>
+            <li><strong>POST /auth/reset-password/:token</strong>: Resets the user's password using a token sent to
+                their email.</li>
         </ul>
 
         <h3>Users</h3>
         <ul class="features">
-            <li><strong>GET /users/me</strong>: Retrieves current user information based on their role.</li>
-            <li><strong>DELETE /users/:userID</strong>: Deletes a user by their ID.</li>
-            <li><strong>PUT /users/:userID</strong>: Updates user information.</li>
+            <li><strong>GET /users/me</strong>: Retrieves current user information based on their role. (Requires
+                authentication)</li>
+            <li><strong>DELETE /users/:userID</strong>: Deletes a user by their ID. (Requires authentication)</li>
+            <li><strong>PUT /users/:userID</strong>: Updates user information. (Requires authentication)</li>
+            <li><strong>PUT /users/credit/:userID</strong>: Adds credit to a user's account. (Requires authentication)
+            </li>
+            <li><strong>GET /users/credit/:userID</strong>: Checks the credit balance of a user. (Requires
+                authentication)</li>
         </ul>
 
         <h3>Parkings</h3>
@@ -34,7 +44,7 @@
             <li><strong>GET /parkings</strong>: Retrieves a list of all parkings.</li>
             <li><strong>GET /parkings/:parkingID</strong>: Retrieves details of a specific parking by its ID.</li>
             <li><strong>POST /parkings</strong>: Creates a new parking. (Requires authentication)</li>
-            <li><strong>PATCH /parkings/:parkingID</strong>: Updates details of a specific parking by its ID. (Requires
+            <li><strong>PUT /parkings/:parkingID</strong>: Updates details of a specific parking by its ID. (Requires
                 authentication)</li>
             <li><strong>DELETE /parkings/:parkingID</strong>: Deletes a specific parking by its ID. (Requires
                 authentication)</li>
@@ -55,8 +65,11 @@
         <ul class="features">
             <li><strong>GET /wardens</strong>: Retrieves all wardens.</li>
             <li><strong>GET /wardens/parking/:parkingID</strong>: Retrieves wardens for a specific parking.</li>
+            <li><strong>GET /wardens/:wardenId</strong>: Retrieves details of a specific warden by their ID.</li>
             <li><strong>POST /wardens/parking/:parkingID</strong>: Adds a new warden to a specific parking.</li>
             <li><strong>PUT /wardens/:wardenId</strong>: Updates a warden by their ID.</li>
+            <li><strong>PUT /wardens/reassign/:wardenId/:newParkingID</strong>: Reassigns a warden to a different
+                parking lot.</li>
             <li><strong>DELETE /wardens/:wardenId</strong>: Deletes a warden by their ID.</li>
         </ul>
 
@@ -65,6 +78,8 @@
             <li><strong>POST /session/:parkingID/start</strong>: Starts a new parking session. (Requires authentication)
             </li>
             <li><strong>DELETE /session/:sessionId</strong>: Deletes a parking session by its ID. (Requires
+                authentication)</li>
+            <li><strong>PATCH /session/:sessionId</strong>: Updates a parking session by its ID. (Requires
                 authentication)</li>
             <li><strong>GET /session</strong>: Retrieves all parking sessions. (Requires authentication)</li>
         </ul>
