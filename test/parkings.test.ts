@@ -15,6 +15,7 @@ beforeAll(async () => {
 describe('GET /parkings', () => {
   it('should return 200 if succefull', async () => {
     const response = await request(app).get('/parkings')
+
     expect(response.status).toBe(200)
   })
 })
@@ -22,23 +23,36 @@ describe('GET /parkings', () => {
 describe('GET /parkings/:parkingID', () => {
   it('should return 404 if not found', async () => {
     const response = await request(app).get('/parkings/0')
+
     expect(response.status).toBe(404)
   })
   it('should return 200 if succefull', async () => {
     const response = await request(app).get('/parkings/2')
+
     expect(response.status).toBe(200)
   })
 })
 
 describe('POST /parkings/', () => {
-  it('should access protected route with valid token', async () => {
+  it('should access protected route with valid token and create parking', async () => {
     const response = await request(app)
       .post('/parkings/')
       .set('Authorization', `${accessToken}`)
-      .send({ name : "parking3" , location: "city2", totalSpaces : 100  })
+      .send({ name: 'parking3', location: 'city2', totalSpaces: 100 })
 
     expect(response.status).toBe(200)
     expect(response.body).toHaveProperty('parking')
   })
 })
 
+describe('DELETE /parkings/', () => {
+  it('should access protected route with valid token and delete parking', async () => {
+    const response = await request(app)
+      .post('/parkings/')
+      .set('Authorization', `${accessToken}`)
+      .send({ name: 'parking3', location: 'via kennedy 63, fossalta di piave', totalSpaces: 100 })
+
+    expect(response.status).toBe(200)
+    expect(response.body).toHaveProperty('parking')
+  })
+})

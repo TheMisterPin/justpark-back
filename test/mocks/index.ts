@@ -1,4 +1,4 @@
-const mockAdmin = {
+const mockAdmin : User = {
   id: 1,
   email: 'mock@admin.com',
   password: 'admin',
@@ -6,14 +6,14 @@ const mockAdmin = {
   createdAt: new Date(),
   updatedAt: new Date(),
   credit: 50,
-  role: 'OWNER',
+  role: Role.OWNER,
   auth: null,
   cars: [],
   parkings: [],
-  WardenAssignment: []
+  WardenAssignment: [],
 }
 
-const mockUser = {
+const mockUser : User = {
   id: 2,
   email: 'mock@user.com',
   password: 'user',
@@ -21,14 +21,14 @@ const mockUser = {
   createdAt: new Date(),
   updatedAt: new Date(),
   credit: 50,
-  role: 'CUSTOMER',
+  role: Role.CUSTOMER,
   auth: null,
   cars: [],
   parkings: [],
-  WardenAssignment: []
+  WardenAssignment: [],
 }
 
-const mockWarden = {
+const mockWarden : User = {
   id: 3,
   email: 'mock@warden.com',
   password: 'warden',
@@ -36,14 +36,14 @@ const mockWarden = {
   createdAt: new Date(),
   updatedAt: new Date(),
   credit: 50,
-  role: 'WARDEN',
+  role: Role.WARDEN,
   auth: null,
   cars: [],
   parkings: [],
-  WardenAssignment: []
+  WardenAssignment: [],
 }
 
-const mockParking = {
+const mockParking : Parking = {
   id: 1,
   name: 'MockParking',
   totalSpaces: 100,
@@ -57,17 +57,17 @@ const mockParking = {
   parkingSessions: [],
   parkingAdmin: mockAdmin,
   location: null,
-  WardenAssignment: []
+  WardenAssignment: [],
 }
 
 const mockLocation = {
   id: 1,
   latitude: 40.712776,
   longitude: -74.005974,
-  parking: mockParking
+  parking: mockParking,
 }
 
-const mockCar = {
+const mockCar : Car = {
   id: 1,
   licencePlate: 'ABC123',
   parkingId: 1,
@@ -76,7 +76,7 @@ const mockCar = {
   updatedAt: new Date(),
   parkedAt: mockParking,
   owner: mockUser,
-  parkingSessions: []
+  parkingSessions: [],
 }
 
 const mockWardenAssignment = {
@@ -85,10 +85,10 @@ const mockWardenAssignment = {
   createdAt: new Date(),
   updatedAt: new Date(),
   parking: mockParking,
-  user: mockWarden
+  user: mockWarden,
 }
 
-const mockParkingSession = {
+const mockParkingSession : ParkingSession = {
   id: 1,
   startTime: new Date(),
   endTime: null,
@@ -96,7 +96,7 @@ const mockParkingSession = {
   parkingId: 1,
   amount: 0,
   car: mockCar,
-  parking: mockParking
+  parking: mockParking,
 }
 
 export {
@@ -107,5 +107,5 @@ export {
   mockLocation,
   mockCar,
   mockWardenAssignment,
-  mockParkingSession
+  mockParkingSession,
 }

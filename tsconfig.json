@@ -8,17 +8,18 @@
         "noImplicitAny": true,
         "typeRoots": [
             "./node_modules/@types",
-            "./src/types"
+            "./types"
         ],
         "esModuleInterop": true
     },
     "include": [
         "./src/**/*",
-        "./src/types/**/*.d.ts",
-        "./.eslintrc.js"
+        "./types/**/*.d.ts",
+        "./.eslintrc.js",
+        "./test/**/*"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
     ]
 }
