@@ -6,8 +6,8 @@ const carRouter = express.Router()
 
 carRouter.post('/', [authMiddleware], addCar)
 
-carRouter.patch('/:licencePlate', updateCar)
+carRouter.patch('/:licencePlate', [authMiddleware], updateCar)
 
-carRouter.delete('/:licencePlate', deleteCar)
+carRouter.delete('/:licencePlate', [authMiddleware], deleteCar)
 
 export default carRouter
